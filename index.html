@@ -1,1 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MSTV Network – Pseudo-Live Streaming</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="MSTV pseudo-live streaming player with playlist and real-time sync.">
 
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+  <style>
+    body {
+      background-color: #1a1a1a;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      text-align: center;
+      padding: 20px 10px;
+      background-color: #000;
+      font-size: 2.5em;
+      font-weight: bold;
+      color: #FFD700;
+    }
+
+    .scrolling-text {
+      overflow: hidden;
+      white-space: nowrap;
+      box-sizing: border-box;
+    }
+
+    .top-scrolling-text {
+      background-color: #222;
+    }
+
+    .bottom-scrolling-text {
+      background-color: #004080;
+    }
+
+    .scrolling-text p {
+      display: inline-block;
+      padding-left: 100%;
+      animation: scroll-left 15s linear infinite;
+      font-size: 1.2em;
+      color: #fff;
+      margin: 0;
+      padding: 10px;
+    }
+
+    @keyframes scroll-left {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+
+    .video-wrapper {
+      position: relative;
+      width: 90%;
+      max-width: 1280px;
+      margin: 30px auto;
+      padding-top: 56.25%;
+      background-color: black;
+    }
+
+    #videoContainer {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #videoPlayer {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    #videoPlayer::-webkit-media-controls {
+      display: none !important;
+    }
+
+    #muteToggle {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      font-size: 1.5em;
+      padding: 5px 10px;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    #liveStamp {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background-color: red;
+      color: white;
+      font-weight: bold;
+      padding: 5px 10px;
+      font-size: 0.9em;
+      border-radius: 5px;
+      z-index: 10;
+    }
+
+    #nowPlaying {
+      text-align: center;
+      font-size: 1.2em;
+      margin: 10px 0;
+    }
+
+    .social {
+      text-align: center;
+      margin: 30px 0;
+    }
+
+    .social a {
+      text-decoration: none;
+      color: #FFD700;
+      font-size: 1.2em;
+    }
+
+    .social i {
+      margin-right: 8px;
+      color: #1877f2;
+    }
+
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      padding: 20px;
+      width: 90%;
+      margin: 0 auto;
+    }
+
+    .image-grid img {
+      width: 100%;
+      height: 100px;
+      object-fit: cover;
+      border: 2px solid #333;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    footer {
+      background-color: black;
+      color: yellow;
+      padding: 20px 10px;
+      text-align: center;
+      font-size: 0.9em;
+    }
+
+    footer h2, footer h3, footer h4 {
+      margin: 10px 0 5px;
+    }
+
+    footer p {
+      margin: 5px 0;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .footer-section {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 40px;
+      margin-bottom: 20px;
+    }
+
+    .footer-column {
+      flex: 1 1 280px;
+      text-align: left;
+    }
+
+    .copyright {
+      margin-top: 10px;
+    }
+
+    @media (max-width: 768px) {
+      header { font-size: 1.8em; }
+      .scrolling-text p { font-size: 1em; }
+      .footer-section { flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>MSTV NETWORK</header>
+
+  <div class="scrolling-text top-scrolling-text">
+    <p>Welcome to MSTV Network — Streaming Live 24/7 — Stay Tuned for Exclusive Content and Updates!</p>
+  </div>
+
+  <div class="video-wrapper">
+    <div id="videoContainer">
+      <video id="videoPlayer" autoplay muted playsinline></video>
+      <span id="muteToggle">🔈</span>
+      <div id="liveStamp">LIVE</div>
+    </div>
+  </div>
+<div id="nowPlaying">Loading...</div>
+  
+  <div class="scrolling-text bottom-scrolling-text">
+    <p id="bottomBannerText">Loading playlist info...</p>
+  </div>
+
+  <div class="social">
+    <a href="https://facebook.com" target="_blank">
+      <i class="fab fa-facebook"></i>Click to follow
+    </a>
+  </div>
+
+  <div class="image-grid">
+    <img src="https://raw.githubusercontent.com/mstvnetwork/mstv1/main/images.jpeg" alt="Partner">
+    <img src="https://raw.githubusercontent.com/mstvnetwork/mstv1/main/download%20(1).jpeg" alt="Partner">
+    <img src="https://raw.githubusercontent.com/mstvnetwork/mstv1/main/images.png" alt="Partner">
+    <img src="https://raw.githubusercontent.com/mstvnetwork/mstv1/main/images%20(4).jpeg" alt="Partner">
+    <img src="https://raw.githubusercontent.com/mstvnetwork/mstv1/main/live-sports-plus-hd-otk-logo.webp" alt="Partner">
+    <img src="https://raw.githubusercontent.com/mstvnetwork/mstv1/main/81GCH6UU7qL.png" alt="Partner">
+    <img src="https://raw.githubusercontent.com/mstvnetwork/mstv1/main/download%20(2).jpeg" alt="Partner">
+    <img src="https://raw.githubusercontent.com/mstvnetwork/mstv1/main/images%20(1).png" alt="Partner">
+  </div>
+
+  <footer>
+    <div class="footer-section">
+      <div class="footer-column">
+        <h2>About Us</h2>
+        <p>MSTV Network is a free streaming platform bringing you 24/7 access to music, movies, news, kids content, and more. We aim to deliver high-quality entertainment for audiences worldwide — no subscriptions, no hidden fees.</p>
+        <h3>⚠️ Disclaimer</h3>
+        <p>MSTV Network streams content freely available on public platforms. We do not host or claim ownership of any third-party media. All copyrights remain with their respective owners.</p>
+        <h4>📜 Terms of Service</h4>
+        <p>By using MSTV Network, you agree to view content solely for personal, non-commercial use. We are not responsible for third-party streams or their availability. Continued use constitutes acceptance of these terms.</p>
+      </div>
+     
+    <div class="copyright">© 2025 MSTV INDIA. All rights reserved.</div>
+  </footer>
+
+  <script>
+    const vp = document.getElementById('videoPlayer');
+    const now = document.getElementById('nowPlaying');
+    const mt = document.getElementById('muteToggle');
+    const bannerText = document.getElementById('bottomBannerText');
+
+    const playlist = [
+      { title: "Saajan", url: "https://cdn3.einthusan.io/etv/content/D0989.mp4.m3u8?e=1755274175&md5=3CFMJcxyLm7sXO2-CeLTlQ", duration: 10800 },
+      { title: "Jurrasic World", url: "https://i-cdn-0.deand373use.com/stream2/i-cdn-0/6ddeb17c170fbd6bb594eb9ac4e2cc2e/MJTMsp1RshGTygnMNRUR2N2MSlnWXZEdMNDZzQWe5MDZzMmdZJTO1R2RWVHZDljekhkSsl1VwYnWtx2cihVT250ROtmTqpEbPRUQ35keBRjT6lUNapWTzoFVNdnTElUNNRVSwklMZhXTqFUP:1755255879:101.119.183.128:59b3fb989d41ba97a327883a69029286bfd298e9b2a926e28e46dd70892c31d3/index.m3u8", duration: 7980  }
+    ];
+
+    const total = playlist.reduce((a, b) => a + b.duration, 0);
+    let idx = -1;
+
+    function pos() {
+      const nowSec = Math.floor(Date.now() / 1000) % total;
+      let off = 0;
+      for (let i = 0; i < playlist.length; i++) {
+        if (nowSec < off + playlist[i].duration) {
+          return { index: i, time: nowSec - off };
+        }
+        off += playlist[i].duration;
+      }
+      return { index: 0, time: 0 };
+    }
+
+    function loadVideo(url, start, title) {
+      vp.src = url;
+      vp.currentTime = start;
+      vp.play().catch(console.warn);
+      now.textContent = `Now Playing: ${title}`;
+    }
+
+    function updateBottomBanner(currentIndex) {
+      const nowTitle = playlist[currentIndex].title;
+      const nextIndex = (currentIndex + 1) % playlist.length;
+      const nextTitle = playlist[nextIndex].title;
+      bannerText.textContent = `🎬 Now Playing: ${nowTitle} | 🎞️ Coming Next: ${nextTitle}`;
+    }
+
+    function sync() {
+      const { index, time } = pos();
+      if (index !== idx) {
+        idx = index;
+        loadVideo(playlist[index].url, time, playlist[index].title);
+        updateBottomBanner(index);
+      }
+      if (Math.abs(vp.currentTime - time) > 2) {
+        vp.currentTime = time;
+      }
+    }
+
+    // Mute toggle
+    mt.addEventListener('click', () => {
+      vp.muted = !vp.muted;
+      mt.textContent = vp.muted ? '🔈' : '🔊';
+    });
+
+    sync();
+    setInterval(sync, 1000);
+  </script>
+</body>
+</html>
